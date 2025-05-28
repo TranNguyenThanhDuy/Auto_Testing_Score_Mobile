@@ -469,10 +469,10 @@ def main():
     all_errors = sbd_errors + errors_made + errors_ans
     notes = '; '.join(all_errors)
 
-    print(f"SBD: {sbd}")
-    print(f"Điểm: {diem}")
+    print(f"✅ Điểm: {diem}")
 
-    with open(f"{sbd}.json", "w", encoding="utf-8") as f:
+    os.makedirs("Result", exist_ok=True)
+    with open(f"Result/{sbd}.json", "w", encoding="utf-8") as f:
         json.dump(result_json, f, indent=4)
     print(f"✅ Hoàn tất. Kết quả đã lưu vào '{sbd}.json'")
 
@@ -489,16 +489,31 @@ def main():
         print(f"❌ Lỗi khi đẩy dữ liệu lên Firebase: {e}")
 
     # 8. Ghi CSV
-    header = ['stt', 'so bao danh', 'diem', 'ma de'] + [str(i) for i in range(1, 41)] + ['ghi chu']
-    file_exists = os.path.isfile(OUTPUT_CSV)
-    write_header = not file_exists or os.path.getsize(OUTPUT_CSV) == 0
+        header = ['stt', 'so bao danh', 'diem', 'ma de'] + [str(i) for i in range(1, 41)] + ['ghi chu']
+        os.makedirs("CSV_Result", exist_ok=True)
+        csv_path = os.path.join("CSV_Result", OUTPUT_CSV)
 
-    with open(OUTPUT_CSV, 'a', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        if write_header:
-            writer.writerow(header)
-        row = [1, sbd, diem, ma_de] + [marks[str(i)] for i in range(1, 41)] + [notes]
-        writer.writerow(row)
+        file_exists = os.path.isfile(csv_path)
+        write_header = not file_exists or os.path.getsize(csv_path) == 0
+        # Tính số dòng hiện có (trừ 1 dòng header nếu đã tồn tại)
+        if file_exists:
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                reader = csv.reader(f)
+                lines = list(reader)
+                current_stt = len(lines) if not write_header else 0
+        else:
+            current_stt = 0
+
+        stt = current_stt + 1  # STT mới
+
+        # Ghi dữ liệu
+        with open(csv_path, 'a', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            if write_header:
+                writer.writerow(header)
+            row = [stt, sbd, diem, ma_de] + [marks[str(i)] for i in range(1, 41)] + [notes]
+            writer.writerow(row)
+
 
 if __name__ == '__main__':
     main()
