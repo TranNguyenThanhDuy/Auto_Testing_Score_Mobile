@@ -1,0 +1,6 @@
+opencv-python
+numpy
+matplotlib
+Flask>=2.0
+Werkzeug>=2.0
+firebase-admin

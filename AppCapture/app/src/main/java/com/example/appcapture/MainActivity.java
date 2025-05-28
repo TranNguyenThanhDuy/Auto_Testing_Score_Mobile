@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,8 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import com.example.appcapture.R;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,8 +43,32 @@ public class MainActivity extends AppCompatActivity {
             String ip = editIp.getText().toString().trim();
             if (currentPhotoPath != null && !ip.isEmpty()) {
                 String serverUrl = "http://" + ip + ":5000/upload";
+                btnSend.setEnabled(false); // 🔒 Khóa nút khi đang gửi
+
                 new Thread(() -> {
-                    UploadUtils.uploadImage(currentPhotoPath, serverUrl);
+                    UploadUtils.uploadImage(currentPhotoPath, serverUrl, new UploadUtils.UploadCallback() {
+                        @Override
+                        public void onSuccess(String sbd) {
+                            runOnUiThread(() -> {
+                                btnSend.setEnabled(true); // 🔓 Mở lại nút
+                                if (sbd == null || sbd.isEmpty()) {
+                                    Toast.makeText(MainActivity.this, "SBD rỗng hoặc không hợp lệ!", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+                                Intent intent = new Intent(MainActivity.this, ResultActivity.class);
+                                intent.putExtra("sbd", sbd);
+                                startActivity(intent);
+                            });
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            runOnUiThread(() -> {
+                                btnSend.setEnabled(true); // 🔓 Mở lại nút
+                                Toast.makeText(MainActivity.this, error, Toast.LENGTH_LONG).show();
+                            });
+                        }
+                    });
                 }).start();
             } else {
                 Toast.makeText(this, "Vui lòng nhập IP và chụp ảnh trước!", Toast.LENGTH_SHORT).show();
@@ -61,7 +82,10 @@ public class MainActivity extends AppCompatActivity {
             File photoFile = null;
             try {
                 photoFile = createImageFile();
-            } catch (IOException ex) { }
+            } catch (IOException ex) {
+                Toast.makeText(this, "Không thể tạo file ảnh!", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (photoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(this,
                         getPackageName() + ".provider",

@@ -1,7 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
-}
 
+    // Add the Google services Gradle plugin
+    id("com.google.gms.google-services")
+
+}
 android {
     namespace = "com.example.appcapture"
     compileSdk = 35
@@ -32,6 +35,15 @@ android {
 }
 
 dependencies {
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+    // Add the dependency for the Firebase SDK for Google Analytics
+    implementation("com.google.firebase:firebase-analytics")
+
+
+    // Realtime Database
+    implementation("com.google.firebase:firebase-database:20.7.0")
 
     implementation(libs.appcompat)
     implementation(libs.material)

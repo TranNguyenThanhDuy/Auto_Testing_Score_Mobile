@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "339620158268",
+    "firebase_url": "https://scoring-project-1b526-default-rtdb.firebaseio.com",
+    "project_id": "scoring-project-1b526",
+    "storage_bucket": "scoring-project-1b526.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:339620158268:android:3ea86ecc0bbb4848911c39",
+        "android_client_info": {
+          "package_name": "com.example.appcapture"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjNXIOLAwr2s9iKYL44QnjNUCQJrM7zYQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

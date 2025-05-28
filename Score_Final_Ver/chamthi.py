@@ -1,11 +1,16 @@
 import os
-
+import sys
+import io
 import cv2
 import numpy as np
 import argparse
 import json
 import matplotlib.pyplot as plt
 import csv
+from datetime import datetime
+from firebase_helper import push_ketqua
+# Cho phép in tiếng Việt ra màn hình mà không lỗi Unicode
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # --- Thêm đoạn này để lấy tham số từ command line (subprocess) ---
 parser = argparse.ArgumentParser()
@@ -333,19 +338,19 @@ with open("result3.json", "w", encoding="utf-8") as f:
 
 print("✅ Hoàn tất. Kết quả đã lưu vào 'result3.json'")
 
-# ----------------------
-# VẼ BIỂU ĐỒ mean_val các ô
-plt.figure(figsize=(12, 6))
-plt.scatter(range(len(all_values)), all_values,
-            c=['red' if l == 1 else 'green' for l in all_labels])
-plt.axhline(190, color='blue', linestyle='--', label='Ngưỡng (threshold = 190)')
-plt.title("Biểu đồ thống kê giá trị trung bình mức xám (mean pixel) của các ô")
-plt.xlabel("Chỉ số ô (index)")
-plt.ylabel("Giá trị mean pixel")
-plt.legend()
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+# # ----------------------
+# # VẼ BIỂU ĐỒ mean_val các ô
+# plt.figure(figsize=(12, 6))
+# plt.scatter(range(len(all_values)), all_values,
+#             c=['red' if l == 1 else 'green' for l in all_labels])
+# plt.axhline(190, color='blue', linestyle='--', label='Ngưỡng (threshold = 190)')
+# plt.title("Biểu đồ thống kê giá trị trung bình mức xám (mean pixel) của các ô")
+# plt.xlabel("Chỉ số ô (index)")
+# plt.ylabel("Giá trị mean pixel")
+# plt.legend()
+# plt.grid(True)
+# plt.tight_layout()
+# plt.show()
 
 import json
 import csv
@@ -359,20 +364,21 @@ OUTPUT_CSV = 'grading_result.csv'
 EXPECTED_SBD_LEN = None
 EXPECTED_MADE_LEN = None
 
-def decode_bubbles(bubbles_dict, label):
-    decoded = ''
+def decode_bubbles(group: dict, mode='sbd'):
+    result = ""
     errors = []
-    for pos in sorted(bubbles_dict, key=lambda x: int(x)):
-        digit_map = bubbles_dict[pos]
-        filled = [d for d, v in digit_map.items() if v == 1]
-        if len(filled) == 1:
-            decoded += filled[0]
-        elif len(filled) == 0:
-            errors.append(f"Khong to {label} ky tu thu {pos}")
+    for idx, bubble in sorted(group.items()):  # group = {'0': {...}, '1': {...}, ...}
+        choices = [k for k, v in bubble.items() if v == 1]  # Lấy các đáp án được tô
+        if len(choices) == 1:
+            result += choices[0]  # Đúng 1 ô → lấy số đó
+        elif len(choices) == 0:
+            result += "?"         # Không tô → đánh dấu lỗi
+            errors.append(f"{mode.upper()} khung {idx} không tô")
         else:
-            errs = ','.join(filled)
-            errors.append(f"To nhieu o o {label} ky tu thu {pos}: {errs}")
-    return decoded, errors
+            result += "?"         # Tô nhiều ô → mơ hồ
+            errors.append(f"{mode.upper()} khung {idx} tô nhiều ô: {choices}")
+    return result, errors
+
 
 def grade_one(result_data, answer_key):
     marks = {}
@@ -395,6 +401,26 @@ def grade_one(result_data, answer_key):
         marks[q_str] = 'Dung' if chosen == correct else 'Sai'
     return marks, errors
 
+def get_nhan_xet(diem_str):
+    try:
+        diem_thuc = float(diem_str.split('|')[0])
+        tong_cau = float(diem_str.split('|')[1])
+        diem_so = diem_thuc / tong_cau * 10
+
+        if diem_so < 5:
+            return "Yếu"
+        elif diem_so < 6.5:
+            return "Trung bình"
+        elif diem_so < 8:
+            return "Khá"
+        elif diem_so < 9:
+            return "Giỏi"
+        else:
+            return "Xuất sắc"
+    except Exception:
+        return "Chưa rõ"
+
+
 def main():
     # 1. Load du lieu
     with open(ANSWERS_FILE, 'r', encoding='utf-8') as f:
@@ -408,14 +434,18 @@ def main():
     EXPECTED_MADE_LEN = len(result_data.get('ma_de', {}))
 
     # 3. Giai ma sbd va ma_de
-    sbd, errors_sbd = decode_bubbles(result_data.get('sbd', {}), 'sbd')
+    sbd, sbd_errors = decode_bubbles(result_data.get('sbd', {}), 'sbd')
     ma_de, errors_made = decode_bubbles(result_data.get('ma_de', {}), 'ma_de')
 
     # 3b. Kiem tra so ky tu neu khong du
-    if len(sbd) < EXPECTED_SBD_LEN:
-        errors_sbd.append(
-            f"sbd khong du ky tu: du kien {EXPECTED_SBD_LEN}, thuc te {len(sbd)}"
-        )
+    EXPECTED_SBD_LENGTH = 6  # sửa theo số ký tự bạn quy định
+
+    if sbd_errors or "?" in sbd or not sbd.isdigit() or len(sbd) != EXPECTED_SBD_LENGTH:
+        print(f"❌ SBD không hợp lệ: {sbd} ({'; '.join(sbd_errors)})")
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        sbd = f"unknown_{timestamp}"
+    else:
+        print(f"✅ SBD: {sbd}")
     if len(ma_de) < EXPECTED_MADE_LEN:
         errors_made.append(
             f"ma_de khong du ky tu: du kien {EXPECTED_MADE_LEN}, thuc te {len(ma_de)}"
@@ -432,17 +462,32 @@ def main():
     # 6. Tinh so cau sai va diem
     wrong_count = sum(1 for v in marks.values() if v == 'Dung')
     diem = f"{wrong_count}|40"
+    tong_cau = 40  # Tổng câu
+    diem_thang_10 = round(wrong_count / tong_cau * 10, 2)
 
     # 7. Tong hop cac loi
-    all_errors = errors_sbd + errors_made + errors_ans
+    all_errors = sbd_errors + errors_made + errors_ans
     notes = '; '.join(all_errors)
 
     print(f"SBD: {sbd}")
     print(f"Điểm: {diem}")
+
     with open(f"{sbd}.json", "w", encoding="utf-8") as f:
         json.dump(result_json, f, indent=4)
-
     print(f"✅ Hoàn tất. Kết quả đã lưu vào '{sbd}.json'")
+
+    # Ghi SBD đã nhận vào file tạm để Flask đọc lại
+    with open("last_sbd.txt", "w", encoding="utf-8") as f:
+        f.write(sbd)
+
+    # --- BỔ SUNG ĐOẠN ĐẨY DỮ LIỆU LÊN FIREBASE ---
+    try:
+        nhan_xet = get_nhan_xet(diem)
+        push_ketqua(sbd, sbd, ma_de, diem_thang_10, nhan_xet)
+
+    except Exception as e:
+        print(f"❌ Lỗi khi đẩy dữ liệu lên Firebase: {e}")
+
     # 8. Ghi CSV
     header = ['stt', 'so bao danh', 'diem', 'ma de'] + [str(i) for i in range(1, 41)] + ['ghi chu']
     file_exists = os.path.isfile(OUTPUT_CSV)

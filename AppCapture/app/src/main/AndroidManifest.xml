@@ -33,6 +33,9 @@
             </intent-filter>
         </activity>
 
+        <!-- ✅ Khai báo ResultActivity -->
+        <activity android:name=".ResultActivity" />
+
         <!-- FileProvider for sharing photo -->
         <provider
             android:name="androidx.core.content.FileProvider"

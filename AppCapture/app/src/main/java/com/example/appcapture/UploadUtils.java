@@ -5,7 +5,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class UploadUtils {
-    public static void uploadImage(String filePath, String serverUrl) {
+
+    // ✅ Interface đặt ở đây
+    public interface UploadCallback {
+        void onSuccess(String sbd);
+        void onError(String error);
+    }
+
+    public static void uploadImage(String filePath, String serverUrl, UploadCallback callback) {
         try {
             File file = new File(filePath);
             String boundary = "*****" + System.currentTimeMillis() + "*****";
@@ -34,10 +41,34 @@ public class UploadUtils {
             dos.close();
 
             int responseCode = conn.getResponseCode();
-            System.out.println("Response code: " + responseCode);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    responseCode == 200 ? conn.getInputStream() : conn.getErrorStream()
+            ));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            reader.close();
+
+            String response = sb.toString();
+
+            if (responseCode == 200) {
+                try {
+                    org.json.JSONObject json = new org.json.JSONObject(response);
+                    String sbd = json.getString("sbd");
+                    callback.onSuccess(sbd);
+                } catch (Exception parseErr) {
+                    callback.onError("Lỗi phân tích JSON: " + parseErr.getMessage());
+                }
+            } else {
+                callback.onError("Lỗi từ server: " + response);
+            }
+
 
         } catch (Exception e) {
-            e.printStackTrace();
+            callback.onError("Lỗi kết nối: " + e.getMessage());
         }
     }
+
 }

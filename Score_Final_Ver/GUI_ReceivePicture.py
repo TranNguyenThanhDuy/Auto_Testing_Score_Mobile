@@ -6,6 +6,8 @@ import os
 import time
 from flask import Flask, request, jsonify
 from werkzeug.serving import make_server
+import json
+from firebase_helper import push_ketqua
 
 # --- Flask setup ---
 app = Flask(__name__)
@@ -53,7 +55,7 @@ def upload_file():
         app_gui.add_result_text(err_msg)
         return jsonify({'error': err_msg}), 500
 
-    # Ảnh sẵn sàng, gọi subprocess chấm điểm
+    # Ảnh sẵn sàng, gọi subprocess chấm điểm(chamthi.py)
     try:
         completed = subprocess.run(
             ['python', 'chamthi.py',
@@ -68,7 +70,17 @@ def upload_file():
         )
         output = completed.stdout or ""
         app_gui.add_result_text(output)
-        return jsonify({'result': output}), 200
+        # ✅ Đọc lại sbd từ file tạm
+        try:
+            with open("last_sbd.txt", "r", encoding="utf-8") as f:
+                sbd = f.read().strip()
+        except Exception as e:
+            print("❌ Không đọc được last_sbd.txt:", e)
+            sbd = "unknown"
+
+        print("📤 SBD gửi về client:", sbd)
+        return jsonify({'result': output, 'sbd': sbd}), 200
+
     except subprocess.CalledProcessError as e:
         err = e.stderr or "Lỗi không rõ"
         app_gui.add_result_text(f"Lỗi chạy chamthi.py: {err}")
