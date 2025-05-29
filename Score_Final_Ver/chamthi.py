@@ -488,31 +488,36 @@ def main():
     except Exception as e:
         print(f"❌ Lỗi khi đẩy dữ liệu lên Firebase: {e}")
 
-    # 8. Ghi CSV
-        header = ['stt', 'so bao danh', 'diem', 'ma de'] + [str(i) for i in range(1, 41)] + ['ghi chu']
-        os.makedirs("CSV_Result", exist_ok=True)
-        csv_path = os.path.join("CSV_Result", OUTPUT_CSV)
+    try:
+        nhan_xet = get_nhan_xet(diem)
+        push_ketqua(sbd, sbd, ma_de, diem_thang_10, nhan_xet)
+    except Exception as e:
+        print(f"❌ Lỗi khi đẩy dữ liệu lên Firebase: {e}")
 
-        file_exists = os.path.isfile(csv_path)
-        write_header = not file_exists or os.path.getsize(csv_path) == 0
-        # Tính số dòng hiện có (trừ 1 dòng header nếu đã tồn tại)
-        if file_exists:
-            with open(csv_path, 'r', encoding='utf-8') as f:
-                reader = csv.reader(f)
-                lines = list(reader)
-                current_stt = len(lines) if not write_header else 0
-        else:
-            current_stt = 0
+    # ✅ Đảm bảo luôn ghi CSV dù Firebase lỗi hay không
+    header = ['stt', 'so bao danh', 'diem', 'ma de'] + [str(i) for i in range(1, 41)] + ['ghi chu']
+    os.makedirs("CSV_Result", exist_ok=True)
+    csv_path = os.path.join("CSV_Result", OUTPUT_CSV)
 
-        stt = current_stt + 1  # STT mới
+    file_exists = os.path.isfile(csv_path)
+    write_header = not file_exists or os.path.getsize(csv_path) == 0
 
-        # Ghi dữ liệu
-        with open(csv_path, 'a', newline='', encoding='utf-8') as f:
-            writer = csv.writer(f)
-            if write_header:
-                writer.writerow(header)
-            row = [stt, sbd, diem, ma_de] + [marks[str(i)] for i in range(1, 41)] + [notes]
-            writer.writerow(row)
+    if file_exists:
+        with open(csv_path, 'r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            lines = list(reader)
+            current_stt = len(lines) if not write_header else 0
+    else:
+        current_stt = 0
+
+    stt = current_stt + 1
+
+    with open(csv_path, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        if write_header:
+            writer.writerow(header)
+        row = [stt, sbd, diem, ma_de] + [marks[str(i)] for i in range(1, 41)] + [notes]
+        writer.writerow(row)
 
 
 if __name__ == '__main__':
