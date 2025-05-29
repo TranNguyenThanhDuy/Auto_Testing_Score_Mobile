@@ -6,4 +6,5 @@
     </style>
 
     <style name="Theme.AppCapture" parent="Base.Theme.AppCapture" />
+
 </resources>

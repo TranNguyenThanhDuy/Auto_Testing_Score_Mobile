@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF5F5F5"
+    android:background="#FFF3E0"
     android:padding="0dp">
 
     <!-- Thanh tiêu đề -->
@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_marginTop="28dp"
-        android:background="@color/dimgray"
+        android:background="@color/orange"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,31 +35,33 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <EditText
-        android:id="@+id/editIp"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Nhập địa chỉ IP server"
-        android:inputType="textUri"
-        android:padding="12dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/black"
-        app:layout_constraintTop_toBottomOf="@id/headerLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <!-- Nút chụp -->
 
     <!-- Ảnh hiển thị -->
 
     <!-- Nút gửi -->
 
+    <EditText
+        android:id="@+id/editIp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="8dp"
+        android:backgroundTint="@color/black"
+        android:hint="Nhập địa chỉ IP server"
+        android:inputType="textUri"
+        android:padding="12dp"
+        app:layout_constraintEnd_toStartOf="@id/btnLogout"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout" />
+
     <Button
         android:id="@+id/btnCapture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:backgroundTint="@color/foody_red"
+        android:backgroundTint="@color/orange"
         android:paddingHorizontal="30dp"
         android:paddingVertical="15dp"
 
@@ -68,6 +70,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/editIp" />
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="86dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="4dp"
+        android:backgroundTint="@color/orange"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:text="Đăng xuất"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/imageView"
@@ -91,12 +108,13 @@
         android:paddingHorizontal="40dp"
         android:paddingVertical="15dp"
 
-        android:backgroundTint="@color/foody_red"
+        android:backgroundTint="@color/orange"
         android:text="Gửi ảnh lên server"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

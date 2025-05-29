@@ -2,25 +2,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg4">
+    android:background="@drawable/study">
 
 
     <LinearLayout
         android:id="@+id/loginContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_margin="32dp"
-        android:background="@drawable/login_card"
+        android:layout_marginTop="4dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="24dp"
+        android:background="@drawable/login_card">
 
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="200dp"
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="351dp"
             android:layout_height="100dp"
-            android:layout_gravity="center"
-            app:srcCompat="@drawable/foody_white_only" />
+            android:gravity="center"
+            android:text="Scoring"
+            android:textColor="@color/black"
+            android:textSize="50sp" />
 
         <EditText
             android:id="@+id/edEmailDN"
@@ -48,21 +51,7 @@
             android:textColor="@color/black"
             android:textColorHint="@color/dimgray" />
 
-        <TextView
-            android:id="@+id/txtQuenMatKhau"
-            android:layout_width="wrap_content"
-            android:layout_height="16dp"
-            android:layout_gravity="end"
-            android:layout_marginTop="12dp"
-            android:background="@android:color/transparent"
-            android:clickable="true"
-            android:focusable="true"
-            android:text="Quên mật khẩu?"
-            android:textColor="@color/black"
-            android:textStyle="bold" />
-
-
-        <Button
+         <Button
             android:id="@+id/button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -72,80 +61,6 @@
             android:textColor="@color/white"
             android:textStyle="bold"
             android:foreground="?attr/selectableItemBackgroundBorderless"/>
-
-
-        <Button
-            android:id="@+id/btnDangKyMoi"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:backgroundTint="@android:color/white"
-            android:text="Đăng ký"
-            android:textColor="@color/light_blue"
-            android:textStyle="bold"
-            android:foreground="?attr/selectableItemBackgroundBorderless"/>
-
-
-        <!-- Dòng phân cách -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="#000000" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="Hoặc"
-                android:textColor="@color/black"
-                android:textStyle="bold" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="#000000" />
-        </LinearLayout>
-
-        <!-- Nút Đăng nhập bằng Google -->
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="12dp">
-
-            <!-- Nút Google -->
-
-            <!-- Icon Google đè lên bên trái -->
-
-            <Button
-                android:id="@+id/btnGoogleLogin"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:backgroundTint="@android:color/white"
-                android:paddingStart="30dp"
-                android:text="Đăng nhập bằng Google"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:foreground="?attr/selectableItemBackgroundBorderless"/>
-
-            <ImageView
-                android:layout_width="45dp"
-                android:layout_height="37dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="1dp"
-                android:contentDescription="Google Icon"
-                android:src="@drawable/ic_google_nobg" />
-        </FrameLayout>
 
 
     </LinearLayout>

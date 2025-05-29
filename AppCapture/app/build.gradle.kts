@@ -40,7 +40,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
     // Add the dependency for the Firebase SDK for Google Analytics
     implementation("com.google.firebase:firebase-analytics")
-
+    implementation("com.google.firebase:firebase-auth")
 
     // Realtime Database
     implementation("com.google.firebase:firebase-database:20.7.0")

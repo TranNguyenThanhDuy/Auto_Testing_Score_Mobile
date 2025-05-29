@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -38,6 +40,17 @@ public class MainActivity extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
 
         btnCapture.setOnClickListener(v -> dispatchTakePictureIntent());
+
+        Button btnLogout = findViewById(R.id.btnLogout);
+
+        btnLogout.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();  // ✅ Đăng xuất khỏi Firebase
+
+            Intent intent = new Intent(MainActivity.this, FLoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);  // Xóa lịch sử activity
+            startActivity(intent);
+            finish();  // ✅ Đóng MainActivity hiện tại
+        });
 
         btnSend.setOnClickListener(v -> {
             String ip = editIp.getText().toString().trim();
